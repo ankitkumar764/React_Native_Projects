@@ -13,8 +13,12 @@ import {
 } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { MaterialIcons } from '@expo/vector-icons';
+// Import useSurvey hook to sync photos with active survey draft
+import { useSurvey } from '../../context/SurveyContext';
 
 export default function CameraScreen() {
+  // Access global survey draft updater function
+  const { updateSurveyData } = useSurvey();
   const cameraRef = useRef(null);
   const [permission, requestPermission] = useCameraPermissions();
   const [facing, setFacing] = useState('back');
@@ -44,10 +48,14 @@ export default function CameraScreen() {
           quality: 0.85,
         });
         const captureTime = new Date();
-        setPhoto({
+        const photoDetails = {
           uri: photoData.uri,
           timestamp: captureTime,
-        });
+        };
+        setPhoto(photoDetails);
+        
+        // Sync captured photo uri with active survey context draft
+        updateSurveyData({ photo: photoDetails });
       } catch (err) {
         Alert.alert("Capture Failed", "Could not take photo. Please try again.");
         console.error(err);
@@ -59,6 +67,8 @@ export default function CameraScreen() {
 
   const handleRetake = () => {
     setPhoto(null);
+    // Clear photo from shared survey context draft
+    updateSurveyData({ photo: null });
     setIsCameraReady(false); // Reset to show opening camera loader next time
   };
 
@@ -77,6 +87,8 @@ export default function CameraScreen() {
           style: "destructive",
           onPress: () => {
             setPhoto(null);
+            // Clear photo from shared survey context draft
+            updateSurveyData({ photo: null });
             setIsCameraReady(false); // Reset camera state for layout loading animation
           },
         },

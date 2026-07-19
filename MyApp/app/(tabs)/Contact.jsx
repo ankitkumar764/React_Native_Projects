@@ -24,7 +24,13 @@ import * as Clipboard from 'expo-clipboard';
 // Import MaterialIcons for a clean and professional look
 import { MaterialIcons } from '@expo/vector-icons';
 
+// Import useSurvey hook to attach contacts to the active survey draft
+import { useSurvey } from '../../context/SurveyContext';
+
 export default function ContactScreen() {
+  // Access global survey draft updater function
+  const { updateSurveyData } = useSurvey();
+
   // =======================================================
   // 1. STATE CONFIGURATIONS
   // =======================================================
@@ -292,6 +298,50 @@ export default function ContactScreen() {
   };
 
   /**
+   * handleContactPress
+   * Triggers when a user clicks on a contact card.
+   * Offers options to copy their number or link them as the surveyor contact for the draft survey.
+   */
+  const handleContactPress = (contact) => {
+    const number = getPhoneNumber(contact);
+    
+    // Construct actions sheet options
+    const actions = [
+      {
+        text: "Cancel",
+        style: "cancel"
+      },
+      {
+        text: "Attach to Survey Draft",
+        onPress: () => {
+          updateSurveyData({
+            contact: {
+              name: contact.name || 'Unnamed Contact',
+              phoneNumber: number || 'No Number'
+            }
+          });
+          Alert.alert("Attached!", `"${contact.name || 'Contact'}" has been linked to your survey draft.`);
+        }
+      }
+    ];
+
+    // If a phone number is available, allow direct copying from this prompt
+    if (number) {
+      actions.push({
+        text: "Copy Phone Number",
+        onPress: () => copyPhoneNumberToClipboard(contact)
+      });
+    }
+
+    Alert.alert(
+      "Contact Actions",
+      `What would you like to do with ${contact.name || 'this contact'}?`,
+      actions,
+      { cancelable: true }
+    );
+  };
+
+  /**
    * handlePullToRefresh
    * Triggers when users pull down the list to fetch updated contacts.
    */
@@ -405,7 +455,11 @@ export default function ContactScreen() {
             const avatarBg = getAvatarColor(item.name);
 
             return (
-              <View style={styles.contactCard}>
+              <TouchableOpacity
+                style={styles.contactCard}
+                onPress={() => handleContactPress(item)}
+                activeOpacity={0.7}
+              >
                 <View style={styles.contactInfoRow}>
                   {/* Avatar Layout: Shows Image if available, otherwise generates initials */}
                   {item.imageAvailable && item.image && item.image.uri ? (
@@ -447,7 +501,7 @@ export default function ContactScreen() {
                     </View>
                   )}
                 </View>
-              </View>
+              </TouchableOpacity>
             );
           }}
           // Rendered when contacts match count is 0

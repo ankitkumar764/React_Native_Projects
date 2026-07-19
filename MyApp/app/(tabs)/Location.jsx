@@ -16,8 +16,13 @@ import * as Location from 'expo-location';
 import * as Clipboard from 'expo-clipboard';
 // Import MaterialIcons for visual feedback and clean buttons
 import { MaterialIcons } from '@expo/vector-icons';
+// Import useSurvey hook to bind GPS data to the active draft survey
+import { useSurvey } from '../../context/SurveyContext';
 
 export default function LocationScreen() {
+  // Access global survey draft updater function
+  const { updateSurveyData } = useSurvey();
+
   // =======================================================
   // 1. State Hooks (Variables to store screen data)
   // =======================================================
@@ -108,6 +113,9 @@ export default function LocationScreen() {
 
       // Save retrieved location coordinates inside state variable
       setLocationData(location);
+      
+      // Update our shared survey draft context with the newly fetched coordinates
+      updateSurveyData({ location: location });
     } catch (error) {
       console.error("Error fetching GPS location:", error);
       Alert.alert(
