@@ -52,6 +52,13 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="Clipboard"
+        options={{
+          title: 'Clipboard',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="clipboard.fill" color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="index"
         options={{
           title: 'Home',

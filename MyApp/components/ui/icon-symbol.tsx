@@ -22,6 +22,7 @@ const MAPPING = {
   'camera.fill': 'photo-camera',
   'location.fill': 'location-on',
   'person.2.fill': 'contacts',
+  'clipboard.fill': 'content-paste',
 } as IconMapping;
 
 /**
