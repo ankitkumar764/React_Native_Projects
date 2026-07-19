@@ -21,6 +21,7 @@ const MAPPING = {
   'assignment.fill': 'assignment',
   'camera.fill': 'photo-camera',
   'location.fill': 'location-on',
+  'person.2.fill': 'contacts',
 } as IconMapping;
 
 /**
